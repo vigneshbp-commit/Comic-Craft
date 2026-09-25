@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}{{ story_title }} - ComicCraft Preview{% endblock %}
+
+{% block content %}
+<!-- Top Comic Title & Meta Header -->
+<div class="comic-card" style="margin-top: 25px; padding-bottom: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <span class="panel-header-badge">STORY PREVIEW</span>
+      <h1 class="comic-title" style="margin-top: 8px;">{{ story_title }}</h1>
+      <p style="font-size: 1.05rem; color: #475569; margin-top: 4px;">
+        <strong>Protagonist:</strong> {{ character_name }} &nbsp;|&nbsp; 
+        <strong>Setting:</strong> {{ setting }} &nbsp;|&nbsp; 
+        <strong>Tone:</strong> {{ tone }} &nbsp;|&nbsp; 
+        <strong>Art Style:</strong> {{ art_style }}
+      </p>
+    </div>
+    <div>
+      <a href="{{ pdf_url }}" download class="btn-comic btn-comic-yellow" id="downloadTopBtn" onclick="handlePdfDownload(event)">
+        📥 Download Comic as PDF
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Panels Container (Sequential 5 Panels) -->
+<div class="panels-container">
+  {% for panel in layout %}
+  <div class="panel-card" id="panel-{{ panel.panel_number }}">
+    
+    <!-- Left Column: Visual Illustration -->
+    <div class="panel-visual">
+      <img src="{{ panel.image_url }}" alt="{{ panel.title }}" loading="lazy">
+    </div>
+
+    <!-- Right Column: Story Text, Dialogues, Captions -->
+    <div class="panel-details">
+      <div>
+        <span class="panel-header-badge">PANEL #{{ panel.panel_number }}</span>
+        <h2 class="panel-title">{{ panel.title }}</h2>
+
+        <!-- Scene Description (in italics) -->
+        {% if panel.scene_description %}
+        <div class="scene-description">
+          <em>{{ panel.scene_description }}</em>
+        </div>
+        {% endif %}
+
+        <!-- Comic Caption Box -->
+        {% if panel.caption %}
+        <div class="comic-caption-box">
+          ⚡ {{ panel.caption }}
+        </div>
+        {% endif %}
+
+        <!-- Dialogue Speech Bubble -->
+        {% if panel.dialogue %}
+        <div class="speech-bubble">
+          <strong>💬 Speech / Dialogue:</strong>
+          <p style="margin-top: 4px; white-space: pre-line;">{{ panel.dialogue }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Narration Box -->
+        {% if panel.narration %}
+        <div class="narration-box">
+          <strong>📖 Narration:</strong>
+          <p style="margin-top: 4px;">{{ panel.narration }}</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Image Prompt Reference (Collapsible) -->
+      {% if panel.image_prompt %}
+      <details class="prompt-reference">
+        <summary style="cursor: pointer; font-weight: 600;">🔍 View AI Image Prompt Reference</summary>
+        <p style="margin-top: 6px; font-style: italic; color: #475569;">{{ panel.image_prompt }}</p>
+      </details>
+      {% endif %}
+    </div>
+
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Bottom Action Bar / PDF Download Button -->
+<div class="action-bar">
+  <div>
+    <h2 style="font-family: var(--font-comic); font-size: 1.8rem; letter-spacing: 1px; color: var(--comic-dark);">
+      READY TO PRINT & SHARE YOUR COMIC?
+    </h2>
+    <p style="font-family: var(--font-sans); font-size: 0.95rem; color: #334155; margin-top: 4px;">
+      Compile all 5 panels, scene narration, dialogues, and illustrations into a multi-page PDF document.
+    </p>
+  </div>
+  <div>
+    <a href="{{ pdf_url }}" download class="btn-comic" id="downloadMainBtn" onclick="handlePdfDownload(event)">
+      📥 Download Your Comic as PDF
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function handlePdfDownload(event) {
+    event.preventDefault();
+    const pdfUrl = event.currentTarget.getAttribute('href');
+    const title = encodeURIComponent("{{ story_title }}");
+    
+    // Trigger direct download via invisible anchor
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = "{{ pdf_filename }}";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    // Redirect to export success confirmation page after triggering download
+    setTimeout(() => {
+      window.location.href = `/export-success?pdf_url=${encodeURIComponent(pdfUrl)}&title=${title}`;
+    }, 600);
+  }
+</script>
+{% endblock %}
