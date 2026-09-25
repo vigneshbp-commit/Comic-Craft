@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}ComicCraft - Create AI Comic Stories{% endblock %}
+
+{% block content %}
+<div class="comic-card">
+  <h1 class="comic-title">CREATE YOUR AI COMIC BOOK</h1>
+  <p class="comic-subtitle">
+    Harness the creative power of Google Gemini AI and visual comic synthesis to craft full 5-panel comic storylines and illustrations in seconds.
+  </p>
+
+  <!-- AI Status Banner -->
+  <div style="background: #F8FAFC; border: 2px solid var(--comic-border); border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; box-shadow: 3px 3px 0 var(--comic-shadow);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center; font-size: 0.9rem;">
+        <span><strong>AI Engines:</strong></span>
+        {% if has_gemini %}
+        <span style="background: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 12px; font-weight: bold; border: 1px solid #86EFAC;">
+          🟢 Gemini 1.5 Active
+        </span>
+        {% else %}
+        <span style="background: #FEF9C3; color: #854D0E; padding: 3px 10px; border-radius: 12px; font-weight: bold; border: 1px solid #FDE047;">
+          🟡 Gemini: Fallback Script
+        </span>
+        {% endif %}
+
+        {% if has_hf %}
+        <span style="background: #DCFCE7; color: #166534; padding: 3px 10px; border-radius: 12px; font-weight: bold; border: 1px solid #86EFAC;">
+          🟢 Stable Diffusion Active
+        </span>
+        {% else %}
+        <span style="background: #FEF9C3; color: #854D0E; padding: 3px 10px; border-radius: 12px; font-weight: bold; border: 1px solid #FDE047;">
+          🟡 Image: Comic Canvas Engine
+        </span>
+        {% endif %}
+      </div>
+      <button type="button" onclick="document.getElementById('apiGuide').classList.toggle('hidden')" style="background: var(--comic-yellow); border: 1.5px solid var(--comic-border); padding: 4px 12px; border-radius: 4px; font-family: var(--font-sans); font-size: 0.85rem; font-weight: bold; cursor: pointer;">
+        🔑 Add API Keys Guide
+      </button>
+    </div>
+
+    <!-- Collapsible API Setup Instructions -->
+    <div id="apiGuide" class="hidden" style="margin-top: 14px; padding-top: 14px; border-top: 1px dashed #CBD5E1; font-size: 0.88rem; line-height: 1.6; color: #334155;">
+      <p><strong>To generate 100% custom AI stories and real Stable Diffusion artwork, add your free keys in <code>.env</code>:</strong></p>
+      <ol style="margin-left: 20px; margin-top: 6px;">
+        <li><strong>Google Gemini API Key:</strong> Get your free key at <a href="https://aistudio.google.com/" target="_blank" style="color: #2563EB; font-weight: bold;">Google AI Studio</a> and set <code>GEMINI_API_KEY=AIzaSy...</code> in your <code>.env</code> file.</li>
+        <li><strong>Hugging Face Token:</strong> Get your free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style="color: #2563EB; font-weight: bold;">Hugging Face Tokens</a> and set <code>HF_API_KEY=hf_...</code> in your <code>.env</code> file.</li>
+        <li>Restart server: <code>python run.py</code> to load the keys!</li>
+      </ol>
+    </div>
+  </div>
+
+  {% if error %}
+  <div style="background: #FEE2E2; border: 2.5px solid #EF4444; color: #991B1B; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; font-weight: bold;">
+    ⚠️ {{ error }}
+  </div>
+  {% endif %}
+
+  <form action="/generate" method="POST" id="comicForm">
+    <!-- Story Prompt -->
+    <div class="form-group">
+      <label class="form-label" for="story_prompt">📖 Story Prompt / Premise</label>
+      <textarea 
+        class="form-control" 
+        id="story_prompt" 
+        name="story_prompt" 
+        rows="3" 
+        placeholder="Describe your story idea... (e.g., A brave fox exploring an enchanted forest to find a legendary star fragment)" 
+        required>A brave fox exploring an enchanted forest</textarea>
+      
+      <!-- Preset Quick-Fill Chips -->
+      <div class="preset-chips">
+        <span style="font-size: 0.85rem; font-weight: 700; align-self: center;">Quick Ideas:</span>
+        <button type="button" class="preset-chip" onclick="fillPreset('A brave fox exploring an enchanted forest', 'Rusty', 'Enchanted Forest', 'Dramatic', 'Comic Book')">🦊 Brave Fox</button>
+        <button type="button" class="preset-chip" onclick="fillPreset('A clumsy robot trying to bake a birthday cake in a futuristic kitchen', 'Bolts', 'Futuristic City', 'Funny', 'Comic Book')">🤖 Clumsy Robot</button>
+        <button type="button" class="preset-chip" onclick="fillPreset('A cybernetic ninja defending neon city rooftops from rogue drones', 'Kaelen', 'Cyberpunk City', 'Action-packed', 'Anime')">⚡ Neon Ninja</button>
+        <button type="button" class="preset-chip" onclick="fillPreset('An astronaut stranded on an alien crystal planet discovering ancient echoes', 'Commander Vance', 'Deep Space', 'Poetic', 'Realistic')">🚀 Crystal Planet</button>
+      </div>
+    </div>
+
+    <!-- Character Name & Setting Grid -->
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label" for="character_name">🦸 Main Character Name</label>
+        <input 
+          type="text" 
+          class="form-control" 
+          id="character_name" 
+          name="character_name" 
+          value="Rusty" 
+          placeholder="e.g. Rusty, Sarah, Detective Vance" 
+          required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="setting">🌍 Story Setting / World</label>
+        <select class="form-control" id="setting" name="setting">
+          <option value="Enchanted Forest" selected>Enchanted Forest</option>
+          <option value="Futuristic City">Futuristic Cyber City</option>
+          <option value="Deep Space">Deep Space / Alien Planet</option>
+          <option value="High School Academy">Academy / High School</option>
+          <option value="Ancient Ruins">Ancient Forgotten Ruins</option>
+          <option value="Steampunk Laboratory">Steampunk Laboratory</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tone & Art Style Grid -->
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label class="form-label" for="tone">🎭 Story Tone</label>
+        <select class="form-control" id="tone" name="tone">
+          <option value="Dramatic" selected>Dramatic & Epic</option>
+          <option value="Funny">Funny & Lighthearted</option>
+          <option value="Poetic">Poetic & Mystical</option>
+          <option value="Action-packed">Action-Packed & Intense</option>
+          <option value="Mystery">Mystery & Suspenseful</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="art_style">🎨 Visual Art Style</label>
+        <select class="form-control" id="art_style" name="art_style">
+          <option value="Comic Book" selected>Classic Comic Book (Ink & Halftone)</option>
+          <option value="Anime">Anime / Manga Graphic Novel</option>
+          <option value="Pixel Art">Retro 16-Bit Pixel Art</option>
+          <option value="Realistic">Cinematic Realistic</option>
+          <option value="Noir">Dark Gritty Film Noir</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Submit CTA -->
+    <div style="margin-top: 30px; text-align: center;">
+      <button type="submit" class="btn-comic" style="width: 100%; max-width: 450px;">
+        💥 GENERATE MY 5-PANEL COMIC! 💥
+      </button>
+      <p style="margin-top: 10px; font-size: 0.9rem; color: #64748B;">
+        Creates story outlines, writes dialogues, illustrates panels & compiles downloadable PDF.
+      </p>
+    </div>
+  </form>
+</div>
+
+<!-- Loading Modal Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-box">
+    <div class="comic-spinner"></div>
+    <h2 class="comic-title" style="font-size: 2rem; margin-bottom: 12px;">CRAFTING COMIC BOOK...</h2>
+    <p id="loadingStatusText" style="font-family: var(--font-sans); font-size: 1rem; color: #475569; min-height: 24px;">
+      Connecting to Google Gemini to write structured 5-panel outline...
+    </p>
+    <div style="margin-top: 20px; font-size: 0.85rem; color: #94A3B8;">
+      Generating panels, dialogues, illustrations, and PDF export. Please hold on!
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function fillPreset(prompt, char, setting, tone, style) {
+    document.getElementById('story_prompt').value = prompt;
+    document.getElementById('character_name').value = char;
+    document.getElementById('setting').value = setting;
+    document.getElementById('tone').value = tone;
+    document.getElementById('art_style').value = style;
+  }
+
+  const form = document.getElementById('comicForm');
+  const overlay = document.getElementById('loadingOverlay');
+  const statusText = document.getElementById('loadingStatusText');
+
+  form.addEventListener('submit', function() {
+    overlay.style.display = 'flex';
+    
+    const steps = [
+      "Consulting Gemini Flash for 5-panel storyboard...",
+      "Unleashing Gemini Pro for narration and dialogues...",
+      "Rendering comic book art for each panel...",
+      "Assembling comic layout...",
+      "Compiling high-resolution PDF document..."
+    ];
+    let stepIdx = 0;
+    setInterval(() => {
+      if (stepIdx < steps.length) {
+        statusText.textContent = steps[stepIdx];
+        stepIdx++;
+      }
+    }, 2800);
+  });
+</script>
+{% endblock %}
