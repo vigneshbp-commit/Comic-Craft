@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Exported Successfully! - ComicCraft{% endblock %}
+
+{% block content %}
+<div class="comic-card success-banner">
+  <div class="success-icon">🎉💥🚀</div>
+  <h1 class="comic-title" style="font-size: 3rem;">COMIC EXPORTED SUCCESSFULLY!</h1>
+  <p class="comic-subtitle" style="font-size: 1.25rem; max-width: 650px; margin: 0 auto 30px;">
+    Your AI-powered comic book has been compiled into a multi-page PDF document and downloaded to your computer.
+  </p>
+
+  <div style="background: #F8FAFC; border: 2.5px dashed var(--comic-border); border-radius: 8px; padding: 20px; max-width: 500px; margin: 0 auto 30px;">
+    <h3 style="font-family: var(--font-comic); font-size: 1.5rem; letter-spacing: 1px;">{{ title }}</h3>
+    <p style="margin-top: 6px; font-size: 0.95rem; color: #475569;">
+      Includes 5 custom-generated comic panels, character dialogues, ambient captions, and story narration.
+    </p>
+    {% if pdf_url and pdf_url != '#' %}
+    <div style="margin-top: 14px;">
+      <a href="{{ pdf_url }}" download class="btn-comic btn-comic-yellow" style="font-size: 1.1rem; padding: 8px 18px;">
+        📄 Download PDF Again
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 20px;">
+    <a href="/" class="btn-comic btn-comic-blue" style="font-size: 1.6rem; padding: 16px 36px;">
+      ✨ GO CREATE ANOTHER COMIC ✨
+    </a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="comicGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE135"/>
+      <stop offset="100%" stop-color="#E63946"/>
+    </linearGradient>
+    <pattern id="dots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+      <circle cx="8" cy="8" r="2.5" fill="#181A20" opacity="0.15"/>
+    </pattern>
+  </defs>
+  <!-- Background -->
+  <rect x="0" y="0" width="800" height="200" fill="url(#comicGrad)" rx="12" stroke="#181A20" stroke-width="6"/>
+  <rect x="0" y="0" width="800" height="200" fill="url(#dots)" rx="12"/>
+  <!-- Action Burst -->
+  <polygon points="120,20 145,70 195,50 165,95 210,125 155,135 170,185 125,150 90,190 85,135 30,140 65,100 25,65 80,70 70,20 110,55" fill="#FFFFFF" stroke="#181A20" stroke-width="4"/>
+  <text x="115" y="115" font-family="Impact, Bangers, sans-serif" font-size="34" font-weight="bold" fill="#E63946" text-anchor="middle" transform="rotate(-8 115 115)">POW!</text>
+  <!-- Main Title -->
+  <text x="480" y="95" font-family="Impact, Bangers, sans-serif" font-size="62" font-weight="900" fill="#181A20" text-anchor="middle" letter-spacing="4">COMICCRAFT</text>
+  <text x="480" y="145" font-family="Helvetica, Arial, sans-serif" font-size="22" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">AI COMIC STORY CREATOR</text>
+</svg>

@@ -1,0 +1,28 @@
+# Python virtual environments
+comiccraft-env/
+env/
+venv/
+.venv/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Environment files
+.env
+
+# Generated user artifacts
+app/static/panels/*.png
+!app/static/panels/.gitkeep
+app/static/exports/*.pdf
+!app/static/exports/.gitkeep
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
